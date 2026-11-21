@@ -57,16 +57,35 @@ TEMPLATES = [
 WSGI_APPLICATION = "gazelle.wsgi.application"
 
 # PostgreSQL
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_DB", "gazelle"),
-        "USER": os.environ.get("POSTGRES_USER", "gazelle"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "gazelle"),
-        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+from urllib.parse import parse_qs, unquote, urlparse
+
+DATABASE_URL = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
+
+if DATABASE_URL:
+    url = urlparse(DATABASE_URL)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": url.path.lstrip("/"),
+            "USER": unquote(url.username or ""),
+            "PASSWORD": unquote(url.password or ""),
+            "HOST": url.hostname,
+            "PORT": url.port or 5432,
+            "OPTIONS": {"sslmode": parse_qs(url.query).get("sslmode", ["require"])[0]},
+        }
     }
-}
+else:
+    # Local dev: docker compose Postgres
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("POSTGRES_DB", "gazelle"),
+            "USER": os.environ.get("POSTGRES_USER", "gazelle"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "gazelle"),
+            "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
