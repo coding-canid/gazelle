@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ candidate.full_name }}{% endblock %}
+
+{% block content %}
+<div class="card confirm">
+  <h1>Delete {{ candidate.full_name }}?</h1>
+  <p class="muted">This permanently removes the candidate and their notes. This can't be undone.</p>
+  <form method="post" class="form-actions">
+    {% csrf_token %}
+    <a class="btn btn-ghost" href="{{ candidate.get_absolute_url }}">Cancel</a>
+    <button class="btn btn-danger" type="submit">Yes, delete</button>
+  </form>
+</div>
+{% endblock %}

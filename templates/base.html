@@ -1,0 +1,38 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Gazelle{% endblock %} · Gazelle</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="{% url 'candidates:list' %}">
+        <span class="brand-mark">G</span> Gazelle
+      </a>
+      <nav class="nav">
+        <a href="{% url 'candidates:list' %}">Candidates</a>
+        <a class="btn btn-gold btn-sm" href="{% url 'candidates:create' %}">+ Add candidate</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message message-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container">Gazelle &middot; Candidate tracking</div>
+  </footer>
+</body>
+</html>

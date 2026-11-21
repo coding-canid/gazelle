@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gazelle}
+      POSTGRES_USER: ${POSTGRES_USER:-gazelle}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gazelle}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

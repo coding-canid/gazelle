@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit {{ object.full_name }}{% else %}Add candidate{% endif %}{% endblock %}
+
+{% block content %}
+<a class="back" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'candidates:list' %}{% endif %}">&larr; Back</a>
+
+<div class="page-head">
+  <h1>{% if object %}Edit {{ object.full_name }}{% else %}Add candidate{% endif %}</h1>
+</div>
+
+<form method="post" class="card form" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <div class="message message-error">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="form-grid">
+    {% for field in form %}
+      <div class="field {% if field.name == 'notes' %}field-full{% endif %} {% if field.errors %}has-error{% endif %}">
+        <label for="{{ field.id_for_label }}">
+          {{ field.label }}{% if field.field.required %} <span class="req">*</span>{% endif %}
+        </label>
+        {{ field }}
+        {% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="form-actions">
+    <a class="btn btn-ghost" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'candidates:list' %}{% endif %}">Cancel</a>
+    <button class="btn btn-gold" type="submit">{% if object %}Save changes{% else %}Add candidate{% endif %}</button>
+  </div>
+</form>
+{% endblock %}

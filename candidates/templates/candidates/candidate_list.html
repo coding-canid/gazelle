@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Candidates{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Candidates</h1>
+    <p class="muted">{{ total_count }} total in pipeline</p>
+  </div>
+  <a class="btn btn-gold" href="{% url 'candidates:create' %}">+ Add candidate</a>
+</div>
+
+<form class="filters" method="get">
+  <input class="input" type="search" name="q" value="{{ q }}" placeholder="Search name, email, or position">
+  <select class="input" name="status">
+    <option value="">All statuses</option>
+    {% for value, label in status_choices %}
+      <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn btn-dark" type="submit">Filter</button>
+  {% if q or current_status %}<a class="btn btn-ghost" href="{% url 'candidates:list' %}">Clear</a>{% endif %}
+</form>
+
+{% if candidates %}
+  <div class="card table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Added</th>
+          <th class="right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in candidates %}
+          <tr>
+            <td><a class="strong-link" href="{{ c.get_absolute_url }}">{{ c.full_name }}</a></td>
+            <td>{{ c.position }}</td>
+            <td><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
+            <td><span class="badge badge-{{ c.status }}">{{ c.get_status_display }}</span></td>
+            <td class="muted">{{ c.created_at|date:"M j, Y" }}</td>
+            <td class="right actions">
+              <a class="btn btn-ghost btn-sm" href="{% url 'candidates:update' c.pk %}">Edit</a>
+              <a class="btn btn-danger btn-sm" href="{% url 'candidates:delete' c.pk %}">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a class="btn btn-ghost btn-sm" href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&status={{ current_status }}">&larr; Prev</a>
+      {% endif %}
+      <span class="muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a class="btn btn-ghost btn-sm" href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&status={{ current_status }}">Next &rarr;</a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% else %}
+  <div class="card empty">
+    <h2>No candidates yet</h2>
+    <p class="muted">{% if q or current_status %}Nothing matches your filters.{% else %}Add your first candidate to start tracking your pipeline.{% endif %}</p>
+    <a class="btn btn-gold" href="{% url 'candidates:create' %}">+ Add candidate</a>
+  </div>
+{% endif %}
+{% endblock %}

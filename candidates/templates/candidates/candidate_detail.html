@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}{{ candidate.full_name }}{% endblock %}
+
+{% block content %}
+<a class="back" href="{% url 'candidates:list' %}">&larr; All candidates</a>
+
+<div class="page-head">
+  <div>
+    <h1>{{ candidate.full_name }}</h1>
+    <p class="muted">{{ candidate.position }}</p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-dark" href="{% url 'candidates:update' candidate.pk %}">Edit</a>
+    <a class="btn btn-danger" href="{% url 'candidates:delete' candidate.pk %}">Delete</a>
+  </div>
+</div>
+
+<div class="card detail">
+  <dl class="detail-grid">
+    <div><dt>Status</dt><dd><span class="badge badge-{{ candidate.status }}">{{ candidate.get_status_display }}</span></dd></div>
+    <div><dt>Email</dt><dd><a href="mailto:{{ candidate.email }}">{{ candidate.email }}</a></dd></div>
+    <div><dt>Phone</dt><dd>{{ candidate.phone|default:"—" }}</dd></div>
+    <div><dt>LinkedIn</dt><dd>{% if candidate.linkedin_url %}<a href="{{ candidate.linkedin_url }}" target="_blank" rel="noopener">View profile</a>{% else %}—{% endif %}</dd></div>
+    <div><dt>Resume</dt><dd>{% if candidate.resume_url %}<a href="{{ candidate.resume_url }}" target="_blank" rel="noopener">Open resume</a>{% else %}—{% endif %}</dd></div>
+    <div><dt>Added</dt><dd>{{ candidate.created_at|date:"M j, Y g:i A" }}</dd></div>
+    <div><dt>Last updated</dt><dd>{{ candidate.updated_at|date:"M j, Y g:i A" }}</dd></div>
+  </dl>
+
+  <h3>Notes</h3>
+  <div class="notes">{{ candidate.notes|default:"No notes yet."|linebreaks }}</div>
+</div>
+{% endblock %}
