@@ -30,4 +30,72 @@
   <h3>Notes</h3>
   <div class="notes">{{ candidate.notes|default:"No notes yet."|linebreaks }}</div>
 </div>
+
+<div class="card detail section">
+  <div class="section-head">
+    <h2>Technical challenges</h2>
+    <form method="post" action="{% url 'challenges:assign' candidate.pk %}" class="assign-form">
+      {% csrf_token %}
+      {{ assign_form.challenge }}
+      <button class="btn btn-gold" type="submit">Assign</button>
+    </form>
+  </div>
+
+  {% if assignments %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Challenge</th>
+            <th>Candidate link</th>
+            <th>Result</th>
+            <th>Answer</th>
+            <th class="right"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in assignments %}
+            <tr>
+              <td>
+                <strong>{{ a.challenge.title }}</strong><br>
+                <span class="muted small">Assigned {{ a.assigned_at|date:"M j, Y" }}</span>
+              </td>
+              <td>
+                <input class="input link-input" type="text" readonly
+                       value="{{ request.scheme }}://{{ request.get_host }}{{ a.get_absolute_url }}"
+                       onclick="this.select()">
+              </td>
+              <td>
+                {% if not a.is_submitted %}
+                  <span class="badge badge-applied">Pending</span>
+                {% elif a.is_correct %}
+                  <span class="badge badge-hired">Correct</span>
+                {% else %}
+                  <span class="badge badge-rejected">Incorrect</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if a.is_submitted %}
+                  <pre class="code code-sm">{{ a.answer }}</pre>
+                  {% if not a.is_correct %}
+                    <span class="muted small">Expected:</span>
+                    <pre class="code code-sm">{{ a.challenge.expected_output }}</pre>
+                  {% endif %}
+                {% else %}—{% endif %}
+              </td>
+              <td class="right">
+                <form method="post" action="{% url 'challenges:delete_assignment' a.pk %}">
+                  {% csrf_token %}
+                  <button class="btn btn-danger btn-sm" type="submit">Remove</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">No challenges assigned yet. Pick one above to generate a private link for {{ candidate.first_name }}.</p>
+  {% endif %}
+</div>
 {% endblock %}

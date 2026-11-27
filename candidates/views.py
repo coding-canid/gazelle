@@ -41,6 +41,14 @@ class CandidateDetailView(DetailView):
     model = Candidate
     context_object_name = "candidate"
 
+    def get_context_data(self, **kwargs):
+        from challenges.forms import AssignChallengeForm
+
+        ctx = super().get_context_data(**kwargs)
+        ctx["assign_form"] = AssignChallengeForm()
+        ctx["assignments"] = self.object.challenge_assignments.select_related("challenge")
+        return ctx
+
 
 class CandidateCreateView(SuccessMessageMixin, CreateView):
     model = Candidate

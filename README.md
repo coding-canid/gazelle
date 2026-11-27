@@ -58,3 +58,24 @@ static/css/styles.css    theme (colors live in :root variables)
 - New fields: add to `Candidate`, then `python manage.py makemigrations && python manage.py migrate`, and add to `CandidateForm.Meta.fields`.
 - Pipeline stages: edit `Candidate.Status` and add a matching `.badge-<value>` style in `styles.css`.
 - Theme colors: change `--gold`, `--black`, etc. at the top of `styles.css`.
+
+## Technical challenges
+
+A simple "what does this code print?" challenge portal (`challenges` app).
+
+1. On a candidate's detail page, choose a challenge under **Technical challenges** and click **Assign**.
+2. Copy the generated private link (`/challenges/take/<token>/`) and send it to the candidate. No login is needed.
+3. The candidate sees the snippet and submits what it prints. They get **one attempt**, and the portal doesn't tell them whether they got it right.
+4. Back on the detail page you'll see **Correct / Incorrect / Pending**, their answer, and the expected output.
+
+Answers are compared after normalizing line endings, trailing spaces and leading/trailing blank lines.
+Three starter challenges are seeded by migration `challenges/0002_seed_challenges`. Add or edit challenges in the
+Django admin at `/admin/` (**Challenges**). Uncheck **is active** to hide one from the assign dropdown.
+
+### Migrations to run
+
+```bash
+python manage.py migrate        # applies challenges.0001_initial and challenges.0002_seed_challenges
+# for the hosted DB:
+DATABASE_URL="postgresql://..." python manage.py migrate
+```

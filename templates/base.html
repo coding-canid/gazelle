@@ -12,10 +12,12 @@
       <a class="brand" href="{% url 'candidates:list' %}">
         <span class="brand-mark">G</span> Gazelle
       </a>
+      {% block nav %}
       <nav class="nav">
         <a href="{% url 'candidates:list' %}">Candidates</a>
         <a class="btn btn-gold btn-sm" href="{% url 'candidates:create' %}">+ Add candidate</a>
       </nav>
+      {% endblock %}
     </div>
   </header>
 

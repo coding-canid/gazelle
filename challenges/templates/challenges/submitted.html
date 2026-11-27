@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Challenge submitted{% endblock %}
+{% block nav %}<span class="nav-tag">Candidate portal</span>{% endblock %}
+
+{% block content %}
+<div class="card confirm">
+  <p class="eyebrow">Technical challenge</p>
+  <h1>Thanks, {{ assignment.candidate.first_name }}!</h1>
+  <p class="muted">Your answer to “{{ assignment.challenge.title }}” was received on {{ assignment.submitted_at|date:"M j, Y \a\t g:i A" }}. The hiring team will be in touch.</p>
+</div>
+{% endblock %}

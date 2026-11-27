@@ -5,6 +5,7 @@ Database and secrets are read from environment variables (see .env.example).
 """
 import os
 from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -16,6 +17,9 @@ def env_bool(name, default=False):
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-insecure-change-me")
 DEBUG = env_bool("DJANGO_DEBUG", True)
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost:8000"
+).split(",")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -25,6 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "candidates",
+    "challenges",
 ]
 
 MIDDLEWARE = [
@@ -56,26 +61,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "gazelle.wsgi.application"
 
-# PostgreSQL
-from urllib.parse import parse_qs, unquote, urlparse
-
+# PostgreSQL: hosted (DATABASE_URL, e.g. Neon on Vercel) or local docker compose
 DATABASE_URL = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 
 if DATABASE_URL:
-    url = urlparse(DATABASE_URL)
+    _url = urlparse(DATABASE_URL)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": url.path.lstrip("/"),
-            "USER": unquote(url.username or ""),
-            "PASSWORD": unquote(url.password or ""),
-            "HOST": url.hostname,
-            "PORT": url.port or 5432,
-            "OPTIONS": {"sslmode": parse_qs(url.query).get("sslmode", ["require"])[0]},
+            "NAME": _url.path.lstrip("/"),
+            "USER": unquote(_url.username or ""),
+            "PASSWORD": unquote(_url.password or ""),
+            "HOST": _url.hostname,
+            "PORT": _url.port or 5432,
+            "OPTIONS": {"sslmode": parse_qs(_url.query).get("sslmode", ["require"])[0]},
         }
     }
 else:
-    # Local dev: docker compose Postgres
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

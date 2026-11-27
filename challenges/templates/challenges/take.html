@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Technical challenge{% endblock %}
+{% block nav %}<span class="nav-tag">Candidate portal</span>{% endblock %}
+
+{% block content %}
+<div class="portal">
+  <p class="eyebrow">Technical challenge</p>
+  <h1>Hi {{ assignment.candidate.first_name }}, here's your challenge</h1>
+  <p class="muted">Read the code below and enter exactly what it prints. You have one attempt, so take your time.</p>
+
+  <div class="card challenge">
+    <div class="challenge-head">
+      <h2>{{ assignment.challenge.title }}</h2>
+      <span class="badge badge-lang">{{ assignment.challenge.get_language_display }}</span>
+    </div>
+    <p>{{ assignment.challenge.prompt }}</p>
+    <pre class="code"><code>{{ assignment.challenge.code_snippet }}</code></pre>
+
+    <form method="post" class="answer-form">
+      {% csrf_token %}
+      <div class="field {% if form.answer.errors %}has-error{% endif %}">
+        <label for="{{ form.answer.id_for_label }}">{{ form.answer.label }}</label>
+        {{ form.answer }}
+        {% for error in form.answer.errors %}<p class="error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-gold" type="submit">Submit answer</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
